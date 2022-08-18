@@ -13,6 +13,7 @@ class FacebookLogin(Resource):
     def get(self):
         redirect_uri = url_for('facebook.auth', _external=True)
         oauth = get_oauth()
+
         return oauth.facebook.authorize_redirect(redirect_uri)
 
 

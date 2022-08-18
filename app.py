@@ -13,11 +13,13 @@ def create_app():
     from twitter.routes import twitter
     from github.routes import github
     from linkedin.routes import linkedin
+    from instagram.routes import instagram
     app.register_blueprint(google)
     app.register_blueprint(facebook)
     app.register_blueprint(twitter)
     app.register_blueprint(github)
     app.register_blueprint(linkedin)
+    app.register_blueprint(instagram)
     return app
 
 
@@ -68,6 +70,18 @@ def get_oauth():
         access_token_url='https://www.linkedin.com/oauth/v2/accessToken',
         authorize_url='https://www.linkedin.com/oauth/v2/authorization',
         client_kwargs={'scope': 'r_liteprofile r_emailaddress'},
+    )
+
+    oauth.register(
+        name='instagram',
+        api_base_url='https://api.instagram.com',
+        access_token_url='https://api.instagram.com/oauth/access_token',
+        authorize_url='https://api.instagram.com/oauth/authorize',
+        client_kwargs={
+            'response_type': 'code',
+            'token_endpoint_auth_method': 'client_secret_post',
+            'scope': 'user_profile user_media'
+        },
     )
 
     return oauth
