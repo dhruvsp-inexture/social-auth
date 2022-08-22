@@ -1,25 +1,34 @@
-from flask import Flask, session
+from flask import Flask
 from authlib.integrations.flask_client import OAuth
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
-from config import FACEBOOK_CLIENT_ID, FACEBOOK_CLIENT_SECRET
+db = SQLAlchemy()
 
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object('config')
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+    db.init_app(app)
+    import models
+    Migrate(app, db)
+
     from google.routes import google
     from facebook.routes import facebook
     from twitter.routes import twitter
     from github.routes import github
     from linkedin.routes import linkedin
     from instagram.routes import instagram
+    from user.routes import user_blueprint
     app.register_blueprint(google)
     app.register_blueprint(facebook)
     app.register_blueprint(twitter)
     app.register_blueprint(github)
     app.register_blueprint(linkedin)
     app.register_blueprint(instagram)
+    app.register_blueprint(user_blueprint)
     return app
 
 

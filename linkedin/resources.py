@@ -1,12 +1,7 @@
 from flask_restful import Resource
 from flask import session, url_for, redirect
 from app import get_oauth
-
-
-class LinkedinHome(Resource):
-    def get(self):
-        user = session.get('user')
-        return user or {'message': 'please login to view profile'}
+from models import User
 
 
 class LinkedinLogin(Resource):
@@ -25,15 +20,21 @@ class LinkedinAuth(Resource):
         email_user = email_resp.json()
         url = 'https://api.linkedin.com/v2/me'
         resp = oauth.linkedin.get(url)
-        user = resp.json()
-        user["email_details"] = email_user
-        print("tokennnnnnnnnnnn", user)
-        if user:
-            session['user'] = user
+        user_data = resp.json()
+        user_data["email_details"] = email_user
+
+        if user_data:
+            if User.query.filter_by(username=user_data['email_details']['elements'][0]['handle~']['emailAddress'],
+                                    platform="Linkedin").first():
+                session['message'] = "Data already exists"
+            else:
+
+                user_object = User(username=user_data['email_details']['elements'][0]['handle~']['emailAddress'],
+                                   name=f'{user_data["localizedFirstName"]} {user_data["localizedLastName"]}',
+                                   platform="Linkedin")
+                session['message'] = 'Data registered successfully'
+                user_object.save_to_db()
+            session['user'] = user_data
+
         return redirect('/')
 
-
-class LinkedinLogout(Resource):
-    def get(self):
-        session.pop('user', None)
-        return redirect('/')

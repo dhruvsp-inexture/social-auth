@@ -1,12 +1,7 @@
 from flask_restful import Resource
-from flask import session, url_for, redirect, request
+from flask import session, url_for, redirect
 from app import get_oauth
-
-
-class TwitterHome(Resource):
-    def get(self):
-        user = session.get('user')
-        return user or {'message': 'please login to view profile'}
+from models import User
 
 
 class TwitterLogin(Resource):
@@ -24,16 +19,18 @@ class TwitterAuth(Resource):
 
         resp = oauth.twitter.get(
             url, params={'skip_status': True, 'include_email': True})
-        user = resp.json()
-        print("userrrrrrrrrrrrrrrrr", user)
-        if user:
-            session['user'] = user
-        return redirect('/')
+        user_data = resp.json()
+        if user_data:
+            if User.query.filter_by(username=user_data['screen_name'], platform="Twitter").first():
+                session['message'] = "Data already exists"
+            else:
 
+                user_object = User(username=user_data['screen_name'], name=user_data["name"],
+                                   platform="Twitter")
+                session['message'] = 'Data registered successfully'
+                user_object.save_to_db()
+            session['user'] = user_data
 
-class TwitterLogout(Resource):
-    def get(self):
-        session.pop('user', None)
         return redirect('/')
 
 

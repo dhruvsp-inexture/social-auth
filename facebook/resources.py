@@ -1,12 +1,7 @@
 from flask_restful import Resource
 from flask import session, url_for, redirect
 from app import get_oauth
-
-
-class FacebookHome(Resource):
-    def get(self):
-        user = session.get('user')
-        return user or {'message': 'please login to view profile'}
+from models import User
 
 
 class FacebookLogin(Resource):
@@ -23,13 +18,16 @@ class FacebookAuth(Resource):
         token = oauth.facebook.authorize_access_token()
         resp = oauth.facebook.get(
             'https://graph.facebook.com/me?fields=id,name,email,picture{url}')
-        user = resp.json()
-        if user:
-            session['user'] = user
+        user_data = resp.json()
+        if user_data:
+            if User.query.filter_by(username=user_data["email"], platform="Facebook").first():
+                session['message'] = "Data already exists"
+            else:
+
+                user_object = User(username=user_data["email"], name=user_data["name"],
+                                   platform="Facebook")
+                session['message'] = 'Data registered successfully'
+                user_object.save_to_db()
+            session['user'] = user_data
         return redirect('/')
 
-
-class FacebookLogout(Resource):
-    def get(self):
-        session.pop('user', None)
-        return redirect('/')

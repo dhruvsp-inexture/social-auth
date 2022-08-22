@@ -1,12 +1,7 @@
 from flask_restful import Resource
 from flask import session, url_for, redirect
 from app import get_oauth
-
-
-class GoogleHome(Resource):
-    def get(self):
-        user = session.get('user')
-        return user or {'message': 'please login to view profile'}
+from models import User
 
 
 class GoogleLogin(Resource):
@@ -20,13 +15,15 @@ class GoogleAuth(Resource):
     def get(self):
         oauth = get_oauth()
         token = oauth.google.authorize_access_token()
-        user = token.get('userinfo')
-        if user:
-            session['user'] = user
-        return redirect('/')
+        user_data = token.get('userinfo')
 
+        if user_data:
+            if User.query.filter_by(username=user_data["email"], platform="Google").first():
+                session['message'] = "Data already exists"
+            else:
+                user_object = User(username=user_data["email"], name=user_data["name"], platform="Google")
+                session['message'] = 'Data registered successfully'
+                user_object.save_to_db()
+            session['user'] = user_data
 
-class GoogleLogout(Resource):
-    def get(self):
-        session.pop('user', None)
         return redirect('/')

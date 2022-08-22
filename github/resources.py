@@ -1,12 +1,7 @@
 from flask_restful import Resource
 from flask import session, url_for, redirect
 from app import get_oauth
-
-
-class GithubHome(Resource):
-    def get(self):
-        user = session.get('user')
-        return user or {'message': 'please login to view profile'}
+from models import User
 
 
 class GithubLogin(Resource):
@@ -21,13 +16,20 @@ class GithubAuth(Resource):
         oauth = get_oauth()
         token = oauth.github.authorize_access_token()
         resp = oauth.github.get('https://api.github.com/user')
-        user = resp.json()
-        if user:
-            session['user'] = user
+        user_data = resp.json()
+        if user_data:
+            if not user_data["email"]:
+                username = user_data["login"]
+            else:
+                username = user_data["email"]
+            if User.query.filter_by(username=username, platform="Github").first():
+                session['message'] = "Data already exists"
+            else:
+
+                user_object = User(username=username, name=user_data["name"],
+                                   platform="Github")
+                session['message'] = 'Data registered successfully'
+                user_object.save_to_db()
+            session['user'] = user_data
         return redirect('/')
 
-
-class GithubLogout(Resource):
-    def get(self):
-        session.pop('user', None)
-        return redirect('/')
