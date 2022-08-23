@@ -13,4 +13,5 @@ class Home(Resource):
 class Logout(Resource):
     def get(self):
         session.pop('user', None)
+        session.pop('message', None)
         return redirect('/')
