@@ -32,68 +32,63 @@ def create_app():
     return app
 
 
-def get_oauth():
-    app = create_app()
-    GOOGLE_CONF_URL = 'https://accounts.google.com/.well-known/openid-configuration'
-    FACEBOOK_CONF_URL = 'https://www.facebook.com/.well-known/openid-configuration'
-    oauth = OAuth(app)
-    oauth.register(
-        name='google',
-        server_metadata_url=GOOGLE_CONF_URL,
-        client_kwargs={
-            'scope': 'openid email profile'
-        }
-    )
-    oauth.register(
-        name='facebook',
-        api_base_url='https://graph.facebook.com/v7.0/',
-        access_token_url='https://graph.facebook.com/v7.0/oauth/access_token',
-        authorize_url='https://www.facebook.com/v7.0/dialog/oauth',
-        client_kwargs={'scope': 'email public_profile'}
-    )
+# def get_oauth():
+    # app = create_app()
+    # GOOGLE_CONF_URL = 'https://accounts.google.com/.well-known/openid-configuration'
+    # FACEBOOK_CONF_URL = 'https://www.facebook.com/.well-known/openid-configuration'
+    # oauth = OAuth(app)
+    # oauth.register(
+    #     name='google',
+    #     server_metadata_url=GOOGLE_CONF_URL,
+    #     client_kwargs={
+    #         'scope': 'openid email profile'
+    #     }
+    # )
+    # oauth.register(
+    #     name='facebook',
+    #     api_base_url='https://graph.facebook.com/v7.0/',
+    #     access_token_url='https://graph.facebook.com/v7.0/oauth/access_token',
+    #     authorize_url='https://www.facebook.com/v7.0/dialog/oauth',
+    #     client_kwargs={'scope': 'email public_profile'}
+    # )
 
-    oauth.register(
-        name='twitter',
-        # api_base_url='https://api.twitter.com/1.1/',
-        # request_token_url='https://api.twitter.com/oauth/request_token',
-        # access_token_url='https://api.twitter.com/oauth/access_token',
-        # authorize_url='https://api.twitter.com/oauth/authenticate',
-        # fetch_token=lambda: session.get('token'),  # DON'T DO IT IN PRODUCTION
-        api_base_url='https://api.twitter.com/1.1/',
-        request_token_url='https://api.twitter.com/oauth/request_token',
-        access_token_url='https://api.twitter.com/oauth/access_token',
-        authorize_url='https://api.twitter.com/oauth/authenticate',
-    )
+    # oauth.register(
+    #     name='twitter',
+    #     api_base_url='https://api.twitter.com/1.1/',
+    #     request_token_url='https://api.twitter.com/oauth/request_token',
+    #     access_token_url='https://api.twitter.com/oauth/access_token',
+    #     authorize_url='https://api.twitter.com/oauth/authenticate',
+    # )
 
-    oauth.register(
-        name='github',
-        api_base_url='https://api.github.com/',
-        access_token_url='https://github.com/login/oauth/access_token',
-        authorize_url='https://github.com/login/oauth/authorize',
-        client_kwargs={'scope': 'user:email'},
-        userinfo_endpoint='https://api.github.com/user',
-    )
+    # oauth.register(
+    #     name='github',
+    #     api_base_url='https://api.github.com/',
+    #     access_token_url='https://github.com/login/oauth/access_token',
+    #     authorize_url='https://github.com/login/oauth/authorize',
+    #     client_kwargs={'scope': 'user:email'},
+    #     userinfo_endpoint='https://api.github.com/user',
+    # )
 
-    oauth.register(
-        name='linkedin',
-        access_token_url='https://www.linkedin.com/oauth/v2/accessToken',
-        authorize_url='https://www.linkedin.com/oauth/v2/authorization',
-        client_kwargs={'scope': 'r_liteprofile r_emailaddress'},
-    )
+    # oauth.register(
+    #     name='linkedin',
+    #     access_token_url='https://www.linkedin.com/oauth/v2/accessToken',
+    #     authorize_url='https://www.linkedin.com/oauth/v2/authorization',
+    #     client_kwargs={'scope': 'r_liteprofile r_emailaddress'},
+    # )
 
-    oauth.register(
-        name='instagram',
-        api_base_url='https://api.instagram.com',
-        access_token_url='https://api.instagram.com/oauth/access_token',
-        authorize_url='https://api.instagram.com/oauth/authorize',
-        client_kwargs={
-            'response_type': 'code',
-            'token_endpoint_auth_method': 'client_secret_post',
-            'scope': 'user_profile user_media'
-        },
-    )
+    # oauth.register(
+    #     name='instagram',
+    #     api_base_url='https://api.instagram.com',
+    #     access_token_url='https://api.instagram.com/oauth/access_token',
+    #     authorize_url='https://api.instagram.com/oauth/authorize',
+    #     client_kwargs={
+    #         'response_type': 'code',
+    #         'token_endpoint_auth_method': 'client_secret_post',
+    #         'scope': 'user_profile user_media'
+    #     },
+    # )
 
-    return oauth
+    # return oauth
 
 
 if __name__ == '__main__':

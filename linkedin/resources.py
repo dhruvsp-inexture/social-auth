@@ -1,19 +1,26 @@
+from authlib.integrations.flask_client import OAuth
 from flask_restful import Resource
-from flask import session, url_for, redirect
-from app import get_oauth
+from flask import session, url_for, redirect, current_app
 from models import User
 
+linkedin_oauth = OAuth(current_app)
+linkedin_oauth.register(
+    name='linkedin',
+    access_token_url='https://www.linkedin.com/oauth/v2/accessToken',
+    authorize_url='https://www.linkedin.com/oauth/v2/authorization',
+    client_kwargs={'scope': 'r_liteprofile r_emailaddress'},
+)
 
 class LinkedinLogin(Resource):
     def get(self):
         redirect_uri = url_for('linkedin.auth', _external=True)
-        oauth = get_oauth()
+        oauth = linkedin_oauth
         return oauth.linkedin.authorize_redirect(redirect_uri)
 
 
 class LinkedinAuth(Resource):
     def get(self):
-        oauth = get_oauth()
+        oauth = linkedin_oauth
         token = oauth.linkedin.authorize_access_token()
         email_url = 'https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))'
         email_resp = oauth.linkedin.get(email_url)

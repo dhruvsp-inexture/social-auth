@@ -1,21 +1,34 @@
+from authlib.integrations.flask_client import OAuth
 from flask_restful import Resource
-from flask import session, url_for, redirect
-from app import get_oauth
+from flask import session, url_for, redirect, current_app
 from models import User
+
+instagram_oauth = OAuth(current_app)
+instagram_oauth.register(
+        name='instagram',
+        api_base_url='https://api.instagram.com',
+        access_token_url='https://api.instagram.com/oauth/access_token',
+        authorize_url='https://api.instagram.com/oauth/authorize',
+        client_kwargs={
+            'response_type': 'code',
+            'token_endpoint_auth_method': 'client_secret_post',
+            'scope': 'user_profile user_media'
+        },
+    )
 
 
 class InstagramLogin(Resource):
     def get(self):
         redirect_uri = url_for('instagram.auth', _external=True)
-        oauth = get_oauth()
+        oauth = instagram_oauth
 
-        redirect_uri = "https://8657-115-246-26-54.in.ngrok.io/instagram/auth"
+        redirect_uri = "https://0a71-115-246-26-54.in.ngrok.io/instagram/auth"
         return oauth.instagram.authorize_redirect(redirect_uri)
 
 
 class InstagramAuth(Resource):
     def get(self):
-        oauth = get_oauth()
+        oauth = instagram_oauth
         token = oauth.instagram.authorize_access_token()
         id_url = 'https://graph.instagram.com/v14.0/me'
         resp_id = oauth.instagram.get(id_url)
